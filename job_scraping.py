@@ -1,7 +1,5 @@
 from bs4 import BeautifulSoup
 import requests
-import re
-import csv
 import pandas as pd
 
 def get_url(position,location):
@@ -51,9 +49,8 @@ def scrape_jobs(position,location):
                 more_detail_link = ''
             
             data.append({'Role':job_role, 'Company Name':company_name, 'Location':location, 'Posted Date':posted_date, 'Key Skill': skill,'Job Description':job_desc, 'More Detail':more_detail_link})
-          
     df = pd.DataFrame(data)
-    df.to_csv('list_of_timesjobs.csv', index=False, encoding='utf-8')
+    df.to_csv('list_of_job_timesjobs.csv', index=False, encoding='utf-8')
 
 # create main
 if __name__ == '__main__':
