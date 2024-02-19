@@ -46,7 +46,6 @@ The scraping is done in a loop to handle pagination. The sequence variable is us
 
 * **Fetch URL**
   The HTML content of the page is fetched using requests.get(url).text and parsed using BeautifulSoup.
-  The job listings are typically contained within <li> elements with the class clearfix job-bx wht-shd-bx.
   ```bash
   template = 'https://www.timesjobs.com/candidate/job-search.html?from=submit&luceneResultSize=100&txtKeywords=0DQT0{}0DQT0&postWeek=60&searchType=personalizedSearch&actualTxtKeywords {}&searchBy=0&rdoOperator=OR&txtLocation={}&pDate=I&sequence={}&startPage={}'
   url = template.format(position,position, location, sequence, start_page)
