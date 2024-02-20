@@ -71,19 +71,12 @@ if not jobs:
     ```python
         soup = BeautifulSoup(html_text, 'lxml')
     ```
-  4. Finding Job Listings
+### Finding Job Listings
   Searches the parsed HTML for all `<li>` elements with the specified class, which typically represent job listings.
     ```python
-    jobs = soup.find_all('li', class_='clearfix job-bx wht-shd-bx')  # Extracts all job listings
-    print('jobs found', len(jobs), 'url', url)  # Prints the number of job listings found and the URL
+    jobs = soup.find_all('li', class_='clearfix job-bx wht-shd-bx')  
+    print('jobs found', len(jobs), 'url', url)  
     ```
-### Execution Block
-```python
-if __name__ == '__main__':
-    position = 'data analyst'
-    location = ''
-    scrape_jobs(position, location)
-```
 ### Extracting Job Details
 For each job listing, the code extracts the following details:
 
@@ -122,20 +115,32 @@ For each job listing, the code extracts the following details:
             except AttributeError:
                 job_desc = '' 
             try:
+                years_exp = job.select_one('ul.top-jd-dtl li:has(i.material-icons:contains("card_travel"))').text.replace('card_travel', '').strip()
+            except AttributeError:
+                experience = ''
+            try:
                 more_detail_link = job.header.h2.a['href']
             except AttributeError:
                 more_detail_link = ''
             
             extract_date = datetime.today().strftime('%Y-%m-%d')
-            
-    
+    ```
+
+### Execution Block
+```python
+if __name__ == '__main__':
+    position = 'data analyst'
+    location = ''
+    scrape_jobs(position, location)
+```
 * **Storing the Data**
-The extracted job details are stored in a list of dictionaries (data). Each dictionary represents a single job listing. After scraping all the job listings, the data is converted into a pandas DataFrame (df).
+The extracted job details are stored in a list of dictionaries `(data)`. Each dictionary represents a single job listing. After scraping all the job listings, the data is converted into a pandas `DataFrame` `(df)`.
   ```python
   data.append({'Role':job_role, 'Company Name':company_name, 'Location':location_company, 'Posted Date':posted_date,'Extracted Date':extract_date,'Key Skill': skill,'Job Description':job_desc, 'More Detail':more_detail_link})
   ```
 * **Saving to CSV**
-Finally, the DataFrame is saved to a CSV file using the to_csv method. The file is named list_of_{position}_timesjobs.csv, where {position} is the URL-encoded version of the original position parameter.
+Finally, the DataFrame is saved to a CSV file using the `to_csv` method. The file is named `list_of_{position}_timesjobs.csv`, where {position} is the URL-encoded version of the original position parameter.
   ```python
     df = pd.DataFrame(data)
     df.to_csv(f'list_of_{position}_timesjobs.csv', index=False, encoding='utf-8')
+```
