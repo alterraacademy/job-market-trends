@@ -69,9 +69,6 @@ def scrape_jobs(position,location):
     df.to_csv(file_path, index=False, encoding='utf-8')
 
 
-
-
-
 if __name__ == '__main__':
     position = 'data analyst'
     location = ''
