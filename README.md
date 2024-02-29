@@ -86,7 +86,53 @@ job_title = find_tag_value(soup, 'a', 'jobTitle')
 company_name = find_tag_value(soup, 'a', 'jobCompany')
 ```
 
+### Scraping Code
+```python
+page = 1
+data = []
+while True:
+    base_url = 'https://www.jobstreet.co.id/id/'
+    url_params = '{}-jobs/in-{}' if search_position and location else '{}-jobs' if search_position else 'jobs-in-{}' if location else 'jobs'
 
+    url = base_url + url_params.format(search_position, location) + '?page={}'.format(page) if search_position or location else base_url + 'jobs?page={}'.format(page)
+
+    r = requests.get(url)
+    soup = BeautifulSoup(r.content, 'lxml')
+    job_cards = soup.find_all('article', attrs={'data-card-type': 'JobCard'})
+
+        
+    if len(job_cards) == 0:
+        print('No More Jobs')
+        break
+    print('page',page,'jobs found', len(job_cards))
+
+```
+#### Initialization 
+   - `page = 1`: Initializes a variable to track the page number of the job listings.
+   - `data = []`: Initializes an empty list to store the extracted job data.
+
+#### URL Construction
+   - `base_url`: Sets the base URL for the JobStreet Indonesia website.
+   - `url_params`: Defines a format string for constructing the URL based on search parameters (`search_position` and `location`).
+   - `url`: Constructs the complete URL for the current page using `base_url`, `url_params`, `search_position`, `location`, and `page` number.
+
+#### Fetching Job Listings
+   - Sends a GET request to the constructed URL using `requests.get(url)`.
+   - Parses the HTML content of the response using BeautifulSoup: `soup = BeautifulSoup(r.content, 'lxml')`.
+
+####  Checking for Job Cards:
+   - If no job cards are found on the page, it indicates that there are no more jobs to scrape. The loop breaks (`break`) out of the while loop.
+
+#### Extracting Job Cards
+   - Finds all job card elements (`<article>`) with the attribute `data-card-type` set to 'JobCard' using `soup.find_all('article', attrs={'data-card-type': 'JobCard'})`.
+   - Each job card typically represents an individual job listing on the page.
+
+This process repeats, incrementing `page` to scrape subsequent pages of job listings until no more job cards are found. The extracted job data is stored in the `data` list for further processing.
+
+### Job Card Data Extraction 
+The following code snippet extracts various details from each job card element (`<article>`) found on the job listings page. It utilizes the `find_tag_value` helper function to extract specific data attributes from the job card.
+
+#### Data Extraction
 
 
 
