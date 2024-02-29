@@ -34,9 +34,9 @@ For using Selenium, first we need to download the Chrome WebDriver. To download 
 
 🔗**Packages: BeautifulSoup, Requests, Pandas, Selenium**
 Install the required packages:
-```bash
-pip install requests beautifulsoup4 pandas selenium
-```
+    ```bash
+    pip install requests beautifulsoup4 pandas selenium
+    ```
 
 ### Usage
 1. Clone the repository to your local machine:
@@ -65,13 +65,13 @@ location = location.lower().replace(' ','-')
 ### Helper Function 
 The `find_tag_value` function is a helper function used to extract text content from HTML elements with a specific tag and attribute. It is primarily used in web scraping to extract data from web pages.
 
-    ```python
-    def find_tag_value(soup, tag, attribute):
-        try:
-            return soup.find(tag, attrs={'data-automation':attribute}).text.strip()
-        except AttributeError:
-            return None
-    ```
+```python
+def find_tag_value(soup, tag, attribute):
+    try:
+        return soup.find(tag, attrs={'data-automation':attribute}).text.strip()
+    except AttributeError:
+        return None
+```
 #### Parameters
 - `soup`: A BeautifulSoup object representing the parsed HTML content of a web page.
 - `tag`: The HTML tag name (e.g., 'a', 'span', 'div') of the element to find.
