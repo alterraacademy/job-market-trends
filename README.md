@@ -2,34 +2,113 @@
 
 ## Overview
 This project analyzes **job market trends** using Python. It scrapes job listings from websites, processes the data, and visualizes the trends over time. The analysis helps job seekers, recruiters, and researchers understand the current job market landscape. The project's output will be utilized by Alterra Academy to tailor their upcoming classes to meet industry demands.
+
 ## Features
 * **Web Scraping**: Utilizes BeautifulSoup and requests libraries to scrape job listings from various websites.
 * **Data Processing**: Cleans and processes the scraped data to extract relevant information such as job title, company name, location, posted date, and requirements.
 * **Data Visualization**: Uses matplotlib or other libraries to create visualizations like histograms, bar charts, and line graphs to showcase job trends.
 
 ## Getting Started
+This Python script scrapes job listings from JobStreet Indonesia based on the specified position and location. It utilizes BeautifulSoup for web scraping and Selenium for navigating and extracting details from job detail pages.
+
 ### Prerequisites
 Before you begin, make sure you have the following installed:
-- Python 3
-- Jupyter Notebook (optional, but recommended for interactive development)
+- Python 
+- Jupyter Notebook/Google Collab
+- Chrome WebDriver
+- BeautifulSoup
+- Requests
+- Pandas
+- Selenium
 
-## Usage
+## Installation
+
+🔗Chrome WebDriver
+For using Selenium, first we need to download the Chrome WebDriver. To download it, follow these steps:
+1. Check Chrome Version: Open Chrome and go to "Settings" > "About Chrome" to find your Chrome version.
+2. Download WebDriver: Visit the Chrome WebDriver Downloads page.
+3. Select Version: Download the WebDriver version that matches your Chrome version.
+4. Extract File: Extract the downloaded file to get the WebDriver executable.
+5. Set Path (Optional): Add the WebDriver executable to your system PATH or specify its location in your Selenium code.
+6. Use WebDriver: Now you can use the WebDriver with Selenium for web automation.
+
+🔗Packages: BeautifulSoup, Requests, Pandas, Selenium
+Install the required packages:
+    ```bash
+    pip install requests beautifulsoup4 pandas selenium
+
+### Usage
 1. Clone the repository to your local machine:
     ```bash
     git clone https://github.com/alterraacademy/job-market-trends.git
 2. Navigate to the project directory:
    ```bash
    cd job-market-trends
-3. Open the `job_scraping.py` file and customize the `position` and `location` variables in the __main__ block according to your requirements.
+3. Open the `scraping_jobstreet.py` file in a Python environment
+4. The script will scrape job listings and save them to CSV files based on the work type.
+
+## Code Explanation
+### User Input : `searched_position` & `location`
+The `search_position` and `location` variables are used to capture user input for the desired job position and location for job searching. The input is then processed to convert the text to lowercase and replace spaces with hyphens. This processing standardizes the input format for constructing the search URL.
+
+    ```python
+    search_position = input('Enter Searched Position: ')
+    location = input('Enter Location: ')
+    search_position = search_position.lower().replace(' ','-')
+    location = location.lower().replace(' ','-')
+    ```
+#### Processing 
+- `.lower()`: Converts the input text to lowercase to ensure consistency.
+- `.replace(' ', '-')`: Replaces spaces with hyphens to format the input for URLs (e.g., "data analyst" becomes "data-analyst").
+
+### Helper Function : `find_tag_value()` 
+The `find_tag_value` function is a helper function used to extract text content from HTML elements with a specific tag and attribute. It is primarily used in web scraping to extract data from web pages.
+
+    ```python
+    def find_tag_value(soup, tag, attribute):
+        try:
+            return soup.find(tag, attrs={'data-automation':attribute}).text.strip()
+        except AttributeError:
+            return None
+    ```
+#### Parameters
+- `soup`: A BeautifulSoup object representing the parsed HTML content of a web page.
+- `tag`: The HTML tag name (e.g., 'a', 'span', 'div') of the element to find.
+- `attribute`: The value of the 'data-automation' attribute used to identify the specific element.
+
+#### Return Value
+The function returns the text content of the found element after stripping any leading or trailing whitespace. If the element is not found or the attribute is not present, it returns `None`.
+
+#### Example Usage
+```python
+job_title = find_tag_value(soup, 'a', 'jobTitle')
+company_name = find_tag_value(soup, 'a', 'jobCompany')
+
+
+
+
+
+
+
+
+
+
+
+
+### Scraping from TimesJob Website
+1. Open the `job_scraping.py` file and customize the `position` and `location` variables in the __main__ block according to your requirements.
    ```bash
    python job_scraping.py
-4. The script will print the number of jobs found and the URL for each page it scrapes. 
-5. Install the required packages:
+
+2. The script will print the number of jobs found and the URL for each page it scrapes. 
+3. Install the required packages:
     ```bash
     pip install requests beautifulsoup4 datetime pandas matplotlib urllib
 
 ## Scraping Job Listings 
-When you're web scraping, you're creating a program to fetch the underlying code of a webpage, which is written in HTML. In this context, we're scraping job listings from **TimesJobs**, we'd use a function called **scrape_jobs** to **extract jobs based on the position and location specified.**
+When you're web scraping, you're creating a program to fetch the underlying code of a webpage, which is written in HTML. 
+
+
 - position: Specify the job position you want to search for (e.g., 'data analyst').
 - location: Specify the location for the job search. Leave it empty for a broader search.
 

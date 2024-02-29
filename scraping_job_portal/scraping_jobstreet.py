@@ -1,13 +1,19 @@
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
-import re, os
+import re
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
-search_position = 'programmer'
-location = 'surabaya'
-search_position = search_position.replace(' ','-')
-location = location.replace(' ','-')
+search_position = input('Enter Searched Position: ')
+location = input('Enter Location: ')
 
+search_position = search_position.lower().replace(' ','-')
+location = location.lower().replace(' ','-')
+
+# Helper Function
 def find_tag_value(soup, tag, attribute):
     try:
         return soup.find(tag, attrs={'data-automation':attribute}).text.strip()
