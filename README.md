@@ -1,6 +1,6 @@
 # Job Market Trend Analysis 📊🏢💡
 
-## Overview 🚀
+## Overview 👻
 This project analyzes **job market trends** using Python. It scrapes job listings from websites, processes the data, and visualizes the trends over time. The analysis helps job seekers, recruiters, and researchers understand the current job market landscape. The project's output will be utilized by Alterra Academy to tailor their upcoming classes to meet industry demands.
 
 ## Features 📋
@@ -8,7 +8,7 @@ This project analyzes **job market trends** using Python. It scrapes job listing
 * **Data Processing**: Cleans and processes the scraped data to extract relevant information such as job title, company name, location, posted date, and requirements.
 * **Data Visualization**: Uses matplotlib or other libraries to create visualizations like histograms, bar charts, and line graphs to showcase job trends.
 
-## Getting Started 📋
+## Getting Started 🚀
 This Python script scrapes job listings from JobStreet Indonesia based on the specified position and location. It utilizes BeautifulSoup for web scraping and Selenium for navigating and extracting details from job detail pages.
 
 ### Prerequisites
@@ -23,7 +23,7 @@ Before you begin, make sure you have the following installed:
 
 ## Installation🛠️
 
-🔗**Chrome WebDriver**
+### 🔗**Chrome WebDriver**
 For using Selenium, first we need to download the Chrome WebDriver. To download it, follow these steps:
 1. Check Chrome Version: Open Chrome and go to "Settings" > "About Chrome" to find your Chrome version.
 2. Download WebDriver: Visit the Chrome WebDriver Downloads page.
@@ -32,8 +32,9 @@ For using Selenium, first we need to download the Chrome WebDriver. To download 
 5. Set Path (Optional): Add the WebDriver executable to your system PATH or specify its location in your Selenium code.
 6. Use WebDriver: Now you can use the WebDriver with Selenium for web automation.
 
-🔗**Packages: BeautifulSoup, Requests, Pandas, Selenium**
-Install the required packages:
+### 🔗**Packages**
+Install the required packages: BeautifulSoup, Requests, Pandas, Selenium
+
 ```bash
 pip install requests beautifulsoup4 pandas selenium
 ```
@@ -58,9 +59,8 @@ location = input('Enter Location: ')
 search_position = search_position.lower().replace(' ','-')
 location = location.lower().replace(' ','-')
 ```
-#### Processing 
-- `.lower()`: Converts the input text to lowercase to ensure consistency.
-- `.replace(' ', '-')`: Replaces spaces with hyphens to format the input for URLs (e.g., "data analyst" becomes "data-analyst").
+- **`.lower()`**: Converts the input text to lowercase to ensure consistency.
+- **`.replace(' ', '-')`**: Replaces spaces with hyphens to format the input for URLs (e.g., "data analyst" becomes "data-analyst").
 
 ### 2. Helper Function ⚡
 The `find_tag_value` function is a helper function used to extract text content from HTML elements with a specific tag and attribute. It is primarily used in web scraping to extract data from web pages.
@@ -79,8 +79,6 @@ def find_tag_value(soup, tag, attribute):
 
 #### Return Value
 The function returns the text content of the found element after stripping any leading or trailing whitespace. If the element is not found or the attribute is not present, it returns `None`.
-
-#### Example Usage
 ```python
 job_title = find_tag_value(soup, 'a', 'jobTitle')
 company_name = find_tag_value(soup, 'a', 'jobCompany')
@@ -107,146 +105,147 @@ while True:
     print('page',page,'jobs found', len(job_cards))
 
 ```
-#### Initialization 
+#### a. Initialization 
    - `page = 1`: Initializes a variable to track the page number of the job listings.
    - `data = []`: Initializes an empty list to store the extracted job data.
 
-#### URL Construction
+#### b. URL Construction
    - `base_url`: Sets the base URL for the JobStreet Indonesia website.
    - `url_params`: Defines a format string for constructing the URL based on search parameters (`search_position` and `location`).
    - `url`: Constructs the complete URL for the current page using `base_url`, `url_params`, `search_position`, `location`, and `page` number.
 
-#### Fetching Job Listings
+#### c. Fetching Job Listings
    - Sends a GET request to the constructed URL using `requests.get(url)`.
    - Parses the HTML content of the response using BeautifulSoup: `soup = BeautifulSoup(r.content, 'lxml')`.
 
-####  Checking for Job Cards:
+#### d. Checking for Job Cards:
    - If no job cards are found on the page, it indicates that there are no more jobs to scrape. The loop breaks (`break`) out of the while loop.
 
-#### Extracting Job Cards
+#### e. Extracting Job Cards
    - Finds all job card elements (`<article>`) with the attribute `data-card-type` set to 'JobCard' using `soup.find_all('article', attrs={'data-card-type': 'JobCard'})`.
    - Each job card typically represents an individual job listing on the page.
 
 This process repeats, incrementing `page` to scrape subsequent pages of job listings until no more job cards are found. The extracted job data is stored in the `data` list for further processing.
 
-### 4. Job Card Data Extraction 
-```python
-for job_card in job_cards:
+### 4. Job Card Data Extraction & Detail Page Navigation 🔎
+
+#### 1. Iterate Through Job Cards 
+    For each job card in job_cards, extract the **job title, company name, location, salary, job classification, job sub-classification, short job description, and posted date **using the `find_tag_value` function.
     
-        job_title = find_tag_value(job_card, 'a', 'jobTitle')
-        
-        company_name = find_tag_value(job_card, 'a', 'jobCompany')
-        
-        location_city = find_tag_value(job_card, 'a', 'jobLocation')
-        
-        salary = find_tag_value(job_card, 'span', 'jobSalary')
-        if salary:
-            salary = salary.replace(u'\xa0', u'')
-
-        job_classification = find_tag_value(job_card, 'a', 'jobClassification')
-        if job_classification:
-            job_classification = re.sub(r'[()]', '', job_classification)
-
-        job_sub_classification = find_tag_value(job_card, 'a', 'jobSubClassification')
-        
-        job_short_desc = find_tag_value(job_card, 'span', 'jobShortDescription')
-
-        posted_date = find_tag_value(job_card, 'span', 'jobListingDate')
-        
-        facility = job_card.find('ul',class_='y735df0 y735df3 _1akoxc50 _1akoxc54')
-        if facility is not None:
-            facility = facility.find_all('li')
-            facility_list = [item.text.strip() for item in facility]
-            facility_list = ', '.join(facility_list)
-        else:
-            facility_list = ''
-        
-        more_detail_link = job_card.find('a', attrs={'data-automation':'job-list-view-job-link'})
-        if more_detail_link:
-            more_detail_link = 'https://www.jobstreet.co.id'+ (more_detail_link.get('href'))
-```
-#### Data Extraction
-- **`job_title`**: Extracts the job title using the find_tag_value function for the `<a>` tag with the attribute `jobTitle`.
-- **`company_name`**: Extracts the company name using the find_tag_value function for the `<a>` tag with the attribute `jobCompany`.
-- **`location_city`**: Extracts the job location (city) using the find_tag_value function for the `<a>` tag with the attribute `jobLocation`.
-- **`salary`**: Extracts the job salary using the find_tag_value function for the `<span>` tag with the attribute `jobSalary`. It also removes any non-breaking space characters `(\xa0)`.
-- **`job_classification`**: Extracts the job classification using the find_tag_value function for the `<a>` tag with the attribute `jobClassification`. It also removes any parentheses.
-- **`job_sub_classification`**: Extracts the job sub-classification using the find_tag_value function for the `<a>` tag with the attribute `jobSubClassification`.
-- **`job_short_desc`**: Extracts the short job description using the find_tag_value function for the `<span>` tag with the attribute `jobShortDescription`.
-- **`posted_date`**: Extracts the job posting date using the find_tag_value function for the `<span>` tag with the attribute `jobListingDate`.
-- **`facility`**: Extracts the job facility information using the find_all method to find all `<li>` elements within the `<ul>` tag with specific classes. It then formats the facility list as a comma-separated string.
-- **`more_detail_link`**: Extracts the URL for more job details using the find method to find the `<a>` tag with the attribute data-automation set to `job-list-view-job-link`. It then appends this URL to the base URL.
-
-### 5. Getting Detail Job Page 🔍
-The following code snippet extracts detailed information about a specific job by navigating to its individual job details page. It uses Selenium to interact with the web page and extract relevant data.
-
-#### Steps
-1. **Initialize WebDriver**: 
-   - Creates a new instance of the Chrome WebDriver.
     ```python
-    driver = webdriver.Chrome()
+    for job_card in job_cards:
+        
+            job_title = find_tag_value(job_card, 'a', 'jobTitle')
+            
+            company_name = find_tag_value(job_card, 'a', 'jobCompany')
+            
+            location_city = find_tag_value(job_card, 'a', 'jobLocation')
+            
+            salary = find_tag_value(job_card, 'span', 'jobSalary')
+            if salary:
+                salary = salary.replace(u'\xa0', u'')
+    
+            job_classification = find_tag_value(job_card, 'a', 'jobClassification')
+            if job_classification:
+                job_classification = re.sub(r'[()]', '', job_classification)
+    
+            job_sub_classification = find_tag_value(job_card, 'a', 'jobSubClassification')
+            
+            job_short_desc = find_tag_value(job_card, 'span', 'jobShortDescription')
+    
+            posted_date = find_tag_value(job_card, 'span', 'jobListingDate')
     ```
-2. **Construct Job Details URL**: 
-   - Uses the `job_id`, `search_position`, and `location` to construct the URL for the specific job's details page.
-    ```python
-    job_detail_url = 'https://www.jobstreet.co.id/id/{}-jobs/in-{}?jobId={}&type=standout'.format(search_position, location, job_id)
-    ```
-3. **Navigate to Job Details Page**: 
-   - Uses `driver.get(job_detail_url)` to navigate to the constructed job details URL.
 
-4. **Wait for Job Details Section**: 
-   - Uses WebDriverWait to wait for a maximum of 5 seconds until the job details section (`div[data-automation="jobDetailsPage"]`) is present on the page.
+    - **`job_title`**: Extracts the job title using the find_tag_value function for the `<a>` tag with the attribute `jobTitle`.
+    - **`company_name`**: Extracts the company name using the find_tag_value function for the `<a>` tag with the attribute `jobCompany`.
+    - **`location_city`**: Extracts the job location (city) using the find_tag_value function for the `<a>` tag with the attribute `jobLocation`.
+    - **`salary`**: Extracts the job salary using the find_tag_value function for the `<span>` tag with the attribute `jobSalary`. It also removes any non-breaking space characters `(\xa0)`.
+    - **`job_classification`**: Extracts the job classification using the find_tag_value function for the `<a>` tag with the attribute `jobClassification`. It also removes any parentheses.
+    - **`job_sub_classification`**: Extracts the job sub-classification using the find_tag_value function for the `<a>` tag with the attribute `jobSubClassification`.
+    - **`job_short_desc`**: Extracts the short job description using the find_tag_value function for the `<span>` tag with the attribute `jobShortDescription`.
+    - **`posted_date`**: Extracts the job posting date using the find_tag_value function for the `<span>` tag with the attribute `jobListingDate`.
+    
+2. **Extract Facility Information**:
+   Extracts the job facility information using the find_all method to find all `<li>` elements within the `<ul>` tag with specific classes. It then formats the facility list as a comma-separated string.
+    ```python
+    facility = job_card.find('ul',class_='y735df0 y735df3 _1akoxc50 _1akoxc54')
+    if facility is not None:
+        facility = facility.find_all('li')
+        facility_list = [item.text.strip() for item in facility]
+        facility_list = ', '.join(facility_list)
+    else:
+        facility_list = ''
+    ```
+
+3. **Extract More Detail Link**:
+   Extracts the URL for more job details using the find method to find the `<a>` tag with the attribute data-automation set to `job-list-view-job-link`. It then appends this URL to the base URL.
+    ```python
+    more_detail_link = job_card.find('a', attrs={'data-automation':'job-list-view-job-link'})
+    if more_detail_link:
+        more_detail_link = 'https://www.jobstreet.co.id'+ (more_detail_link.get('href'))
+    ```
+
+4. **Navigate to Job Detail Page**:
+    a. **Initialize WebDriver**: Creates a new instance of the Chrome WebDriver.
+        ```python
+        driver = webdriver.Chrome()
+        ```
+    b. **Construct Job Details URL**: Uses the `job_id`, `search_position`, and `location` to construct the URL for the specific job's details page.
+        ```python
+        job_detail_url = 'https://www.jobstreet.co.id/id/{}-jobs/in-{}?jobId={}&type=standout'.format(search_position, location, job_id)
+        ```
+    c. **Navigate to Job Details Page**: Uses `driver.get(job_detail_url)` to navigate to the constructed job details URL.
+    
+5. **Find Job Details Section**:
+   a. Wait for the job details section to be present on the page for a maximum 5 seconds.
      ```python
      wait = WebDriverWait(driver, 5)
         job_details_section = wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, 'div[data-automation="jobDetailsPage"]')))
      ```
-5. **Extract HTML Content**: 
-   - Uses `driver.page_source` to get the HTML content of the current page.
-   - Parses the HTML content using BeautifulSoup (`BeautifulSoup(driver.page_source, 'lxml')`) to create a BeautifulSoup object (`soup_job_detail_request`).
+   b. Uses `driver.page_source` to get the HTML content of the current page.
+   c. Parses the HTML content using BeautifulSoup (`BeautifulSoup(driver.page_source, 'lxml')`) to create a BeautifulSoup object (`soup_job_detail_request`).
      ```python
      soup_job_detail_request = BeautifulSoup(driver.page_source, 'lxml')
      ```
-6. **Find Job Details Section**: 
-   - Finds the specific job details section (`<div>` with attribute `data-automation='jobDetailsPage'`) in the parsed HTML content.
+   d. Finds the specific job details section (`<div>` with attribute `data-automation='jobDetailsPage'`) in the parsed HTML content.
      ```python
      job_detail_page = soup_job_detail_request.find('div', attrs={'data-automation':'jobDetailsPage'})
      ```
-7. **Extract Work Type & Job Description**: 
-   - Uses the `find_tag_value` function to extract the work type from the job details section.
-   - Uses the `find_tag_value` function to extract the job description from the job details section.
+     
+6. **Extract Work Type and Job Description**:
+   a. Uses the `find_tag_value` function to extract the work type from the job details section.
+   b. Uses the `find_tag_value` function to extract the job description from the job details section.
     ```python
      work_type = find_tag_value(job_detail_page, 'span', 'job-detail-work-type')
     job_desc = find_tag_value(job_detail_page, 'div', 'jobAdDetails')
     ```
-8. **Quit WebDriver**: 
-   - `driver.quit()`: Closes the WebDriver to free up resources.
-     
-### 5. Collecting Extracted Job Data 📕
-The `data.append()` method is used to collect the extracted details of each job listing into **a list of dictionaries**. Each dictionary represents one job listing with its corresponding details.
-```python
-data.append({
-    'Job Title': job_title,
-    'Company Name': company_name,
-    'Location': location_city,
-    'Salary': salary,
-    'Work Type': work_type,
-    'Job Classification': job_classification,
-    'Job Sub Classification': job_sub_classification,
-    'Job Short Description': job_short_desc,
-    'Job Description': job_desc,
-    'Facility': facility_list,
-    'Posted Date': posted_date
-})
-```
+    
+7. **Quit WebDriver**
+   `driver.quit()`: Close the WebDriver to free up resources.   
+
+8. **Collect Extracted Data**:
+    The `data.append()` method is used to collect the extracted details of each job listing into **a list of dictionaries**. Each dictionary represents one job listing with its corresponding details.
+    ```python
+    data.append({
+        'Job Title': job_title,
+        'Company Name': company_name,
+        'Location': location_city,
+        'Salary': salary,
+        'Work Type': work_type,
+        'Job Classification': job_classification,
+        'Job Sub Classification': job_sub_classification,
+        'Job Short Description': job_short_desc,
+        'Job Description': job_desc,
+        'Facility': facility_list,
+        'Posted Date': posted_date
+    })
+    ```
+9. **Increment Page Number**: Increment the `page` variable to move to the next page of job listings.
+      
 
 
 
-
-
-
-
-
-
+# TimesJob
 ### Scraping from TimesJob Website
 1. Open the `job_scraping.py` file and customize the `position` and `location` variables in the __main__ block according to your requirements.
    ```bash
