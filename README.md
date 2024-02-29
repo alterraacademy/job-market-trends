@@ -23,7 +23,7 @@ Before you begin, make sure you have the following installed:
 
 ## Installation
 
-🔗Chrome WebDriver
+🔗**Chrome WebDriver**
 For using Selenium, first we need to download the Chrome WebDriver. To download it, follow these steps:
 1. Check Chrome Version: Open Chrome and go to "Settings" > "About Chrome" to find your Chrome version.
 2. Download WebDriver: Visit the Chrome WebDriver Downloads page.
@@ -32,10 +32,11 @@ For using Selenium, first we need to download the Chrome WebDriver. To download 
 5. Set Path (Optional): Add the WebDriver executable to your system PATH or specify its location in your Selenium code.
 6. Use WebDriver: Now you can use the WebDriver with Selenium for web automation.
 
-🔗Packages: BeautifulSoup, Requests, Pandas, Selenium
+🔗**Packages: BeautifulSoup, Requests, Pandas, Selenium**
 Install the required packages:
-    ```bash
-    pip install requests beautifulsoup4 pandas selenium
+```bash
+pip install requests beautifulsoup4 pandas selenium
+```
 
 ### Usage
 1. Clone the repository to your local machine:
@@ -48,20 +49,20 @@ Install the required packages:
 4. The script will scrape job listings and save them to CSV files based on the work type.
 
 ## Code Explanation
-### User Input : `searched_position` & `location`
+### User Input  
 The `search_position` and `location` variables are used to capture user input for the desired job position and location for job searching. The input is then processed to convert the text to lowercase and replace spaces with hyphens. This processing standardizes the input format for constructing the search URL.
 
-    ```python
-    search_position = input('Enter Searched Position: ')
-    location = input('Enter Location: ')
-    search_position = search_position.lower().replace(' ','-')
-    location = location.lower().replace(' ','-')
-    ```
+```python
+search_position = input('Enter Searched Position: ')
+location = input('Enter Location: ')
+search_position = search_position.lower().replace(' ','-')
+location = location.lower().replace(' ','-')
+```
 #### Processing 
 - `.lower()`: Converts the input text to lowercase to ensure consistency.
 - `.replace(' ', '-')`: Replaces spaces with hyphens to format the input for URLs (e.g., "data analyst" becomes "data-analyst").
 
-### Helper Function : `find_tag_value()` 
+### Helper Function 
 The `find_tag_value` function is a helper function used to extract text content from HTML elements with a specific tag and attribute. It is primarily used in web scraping to extract data from web pages.
 
     ```python
@@ -83,6 +84,7 @@ The function returns the text content of the found element after stripping any l
 ```python
 job_title = find_tag_value(soup, 'a', 'jobTitle')
 company_name = find_tag_value(soup, 'a', 'jobCompany')
+```
 
 
 
