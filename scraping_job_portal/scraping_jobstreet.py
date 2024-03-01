@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
-import re
+import re, os
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -88,9 +88,22 @@ while True:
         
         job_id = job_card['data-job-id']
         
-        # job_detail_request = requests.get('https://www.jobstreet.co.id/id/{}-jobs/in-{}?jobId={}&type=standout'.format(search, location, job_id))
-        # soup_job_detail_request = BeautifulSoup(job_detail_request.content, 'lxml')
-        # job_cards = soup_job_detail_request.find_all('article',attrs={'data-card-type':'JobCard'}) 
+        # Getting Detail Job Page
+        driver = webdriver.Chrome()
+        job_detail_url = 'https://www.jobstreet.co.id/id/{}-jobs/in-{}?jobId={}&type=standout'.format(search_position, location, job_id)
+        driver.get(job_detail_url)
+
+        job_details_section = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CSS_SELECTOR,'div[data-automation="jobDetailsPage"]')))
+        soup_job_detail_request = BeautifulSoup(driver.page_source, 'lxml')
+
+        job_detail_page = soup_job_detail_request.find('div', attrs={'data-automation':'jobDetailsPage'})
+
+        work_type = find_tag_value(job_detail_page, 'span', 'job-detail-work-type')
+
+        job_desc = find_tag_value(job_detail_page, 'div', 'jobAdDetails')
+        
+        driver.quit()
+        
 
         data.append({'Job Title':job_title, 'Company Name':company_name, 'Location':location_city, 'Salary':salary, 'Job Classification':job_classification, 'Job Sub Classification':job_sub_classification, 'Job Description':job_desc, 'Facility':facility_list, 'Posted Date':posted_date})
         

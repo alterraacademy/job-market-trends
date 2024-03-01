@@ -50,6 +50,7 @@ pip install requests beautifulsoup4 pandas selenium
 4. The script will scrape job listings and save them to CSV files based on the work type.
 
 ## Code Explanation 👀📖
+### Jobstreet 
 ### 1. User Input 👩‍💻👨‍💻
 The `search_position` and `location` variables are used to capture user input for the desired job position and location for job searching. The input is then processed to convert the text to lowercase and replace spaces with hyphens. This processing standardizes the input format for constructing the search URL.
 
