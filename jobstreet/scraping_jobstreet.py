@@ -66,15 +66,15 @@ while True:
             salary = salary.replace(u'\xa0', u'')
 
         job_classification = find_tag_value(job_card, 'a', 'jobClassification')
-            #remove () from job_classification
         if job_classification:
             job_classification = re.sub(r'[()]', '', job_classification)
 
         job_sub_classification = find_tag_value(job_card, 'a', 'jobSubClassification')
         
-        job_short_desc = find_tag_value(job_card, 'span', 'jobShortDescription') 
+        job_short_desc = find_tag_value(job_card, 'span', 'jobShortDescription')
 
         posted_date = find_tag_value(job_card, 'span', 'jobListingDate')
+
         current_date = pd.Timestamp.now().strftime('%Y-%m-%d')
         
         if 'hari' in posted_date:
@@ -82,6 +82,7 @@ while True:
             posted_date = (pd.Timestamp.now() - pd.Timedelta(days=days)).strftime('%Y-%m-%d')
         else:
             posted_date = current_date
+
         
         facility = job_card.find('ul',class_='y735df0 y735df3 _1akoxc50 _1akoxc54')
         if facility is not None:
@@ -90,22 +91,18 @@ while True:
             facility_list = ', '.join(facility_list)
         else:
             facility_list = ''
-        
         more_detail_link = job_card.find('a', attrs={'data-automation':'job-list-view-job-link'})
         if more_detail_link:
             more_detail_link = 'https://www.jobstreet.co.id'+ (more_detail_link.get('href'))
         
         job_id = job_card['data-job-id']
 
-        detail_url_params = 'jobs/in-{}?jobId={}&type=standout' 
-        
-        job_detail_section = soup.find('div', attrs={'data-sticky':'job-details-page'})
-        # Getting Detail Job Page
-
-        
-        job_detail_type = job_detail_section.find('span', attrs={'data-automation':'job-detail-work-type'}).text.strip()
-
-        job_detail_desc = job_detail_section.find('div', attrs={'data-automation':'jobAdDetails'}).text.strip()
+        base_detail_url = 'https://www.jobstreet.co.id/id/job/{}?type=standard&ref=search-standalone'
+        r_detail = requests.get(base_detail_url.format(job_id))
+        soup = BeautifulSoup(r_detail.content, 'lxml')
+        work_type = find_tag_value(soup,'span','job-detail-work-type')
+        job_desc = find_tag_value(soup, 'div', 'jobAdDetails')
+    
 
         # driver = webdriver.Chrome()
         # job_detail_url = 'https://www.jobstreet.co.id/id/{}-jobs/in-{}?jobId={}&type=standout'.format(search_position, location, job_id)
@@ -123,13 +120,13 @@ while True:
         # driver.quit()
         
 
-        data.append({'Job Title':job_title, 'Company Name':company_name, 'Location':location_city, 'Salary':salary, 'Job Classification':job_classification, 'Job Sub Classification':job_sub_classification, 'Job Description':job_short_desc, 'Facility':facility_list, 'Posted Date':posted_date,'More Detail':more_detail_link})
+        data.append({'Job Title':job_title, 'Company Name':company_name, 'Location':location_city, 'Salary':salary,'Job Classification':job_classification, 'Job Sub Classification':job_sub_classification,'Facility':facility_list, 'Posted Date':posted_date,'Job Type':work_type,'Job Description':job_desc,'More Detail Link':more_detail_link,'Job ID':job_id})
         
     page += 1
 
 df = pd.DataFrame(data)
 script_dir = os.path.dirname(os.path.abspath(__file__))
-custom_name = f'list_of_jobs_jobstreet.csv'
+custom_name = f'list_of_jobs_jobstreet_updated.csv'
 file_path = os.path.join(script_dir, custom_name)
 df.to_csv(file_path, index=False, encoding='utf-8')
 
