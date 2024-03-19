@@ -3,7 +3,6 @@ import requests
 import pandas as pd
 import re, os
 
-
 # Helper Function
 def find_tag_value(soup, tag, attribute):
     try:
@@ -12,37 +11,6 @@ def find_tag_value(soup, tag, attribute):
         return None
     
 list_jobs = {'golang','.net','php','laravel','java','python','nodejs','reactjs','nextjs','angularjs','fluter','kotlin','vuejs','backend','frontend','mobile','data','software engineer','software developer','full-stack','programmer','javascript'}
-
-
-# list_jobs = {'golang','.net'}
-
-# list_jobs_2 = {
-#     "php" : ["php", "code igniter", "ci", "laravel", "lumen"],
-#     "java" : ["java", "springboot"],
-#      "python" : ["python", "flask"],
-#     "nodejs" : ["node js", "express js", "expressjs", "nodejs", "node", "node-js"],
-#     "reactjs" : ["reactjs", "react-js", "react js", "react"],
-#     "nextjs" : ["nextjs", "next-js", "next js", "next"],
-#     "angularjs" : ["angular", "angularjs"],
-#     "fluter" : ["fluter"],
-#     "kotlin" : ["kotlin"],
-#     "vuejs" : ["vue-js", "vuejs", "vue", "vue js"],
-#     "backend" : ["back-end", "backend", "back end", "ruby"],
-#     "frontend" : ["front-end", "frontend", "front end", "svelte", "nuxt"],
-#     "mobile" : ["mobile", "mobile dev", "mobile apps", "react native", "native", "android", "ios"],
-#     "data" : ["data-engineer", "data engineer", "de", "data", "scientist", "analyst", "sql"],
-#     "other" : ["software engineer", "software developer", "software", "full-stack", "fullstack", "programmer", "javascript" ]   
-# }
-
-
-
-
-    
-# search_position = input('Enter Searched Position: ')
-# location = input('Enter Location: ')
-
-# search_position = search_position.lower().replace(' ','-')
-# location = location.lower().replace(' ','-')
 
 page = 1
 data = []
@@ -122,9 +90,6 @@ for i in list_jobs:
             work_type = find_tag_value(soup,'span','job-detail-work-type')
             job_desc = find_tag_value(soup, 'div', 'jobAdDetails')
         
-
-
-
             data.append({'Job Title':job_title, 'Company Name':company_name, 'Location':location_city, 'Salary':salary,'Job Classification':job_classification, 'Job Sub Classification':job_sub_classification,'Facility':facility_list, 'Posted Date':posted_date,'Job Type':work_type,'Job Description':job_desc,'More Detail':more_detail_link,'Job ID':job_id})
             
         page += 1
