@@ -10,7 +10,7 @@ def find_tag_value(soup, tag, attribute):
     except AttributeError:
         return None
     
-list_jobs = {'golang','.net','php','laravel','java','python','nodejs','reactjs','nextjs','angularjs','fluter','kotlin','vuejs','backend','frontend','mobile','data','software engineer','software developer','full-stack','programmer','javascript'}
+list_jobs = {'golang','.net','php','laravel','java','python','nodejs','reactjs','nextjs','angularjs','fluter','kotlin','vuejs','backend','frontend','mobile','data','software engineer','software developer','full-stack','programmer','javascript','hr officer','accounting officer'}
 
 page = 1
 data = []
