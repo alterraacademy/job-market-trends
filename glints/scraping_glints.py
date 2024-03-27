@@ -1,80 +1,105 @@
 from bs4 import BeautifulSoup
 import requests
 import pandas as pd
-import re, os
+import os
 
-search_position = 'backend'
-location = 'jakarta'
-page_number = 1
-
-
-def find_tag_value(soup, tag, attribute):
+# Helper Function
+def find_tag_value(soup, tag, class_name):
     try:
-        return soup.find(tag, class_=attribute).text.strip()
+        return soup.find(tag, class_=(class_name)).text.strip()
     except AttributeError:
         return None
-
-while True:
-    # Build the URL with the current page number
-    # url = f"https://glints.com/id/lowongan-kerja?page={page_number}"
-    url = 'https://glints.com/id/opportunities/jobs/explore?keyword={}&country=ID&locationName={}&page={}'.format(search_position, location, page_number)
-    print(url)
-
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, "lxml")
     
-    # Perform your scraping code here for the current page
-    # results = soup.find(id="__next")
-    # job_elements = results.find_all("div", class_="JobCardsc__JobcardContainer-sc-hmqj50-0 iirqVR CompactOpportunityCardsc__CompactJobCardWrapper-sc-dkg8my-2 bMyejJ compact_job_card")
-    # print(job_elements)
-      
+def find_tag_attr(job_card, attr):
+    try:
+        return job_card.find('div', {'data-gtm-job-' + attr: True})['data-gtm-job-' + attr]
+    except (AttributeError, KeyError):
+        return None
+    
+
+# list_jobs = {'golang','.net','php','laravel','java','python','nodejs','reactjs','nextjs','angularjs','fluter','kotlin','vuejs','backend','frontend','mobile','data','software engineer','software developer','full-stack','programmer','javascript','hr officer','accounting officer'}
+
+list_jobs = {'golang'}
+
+# page = 1
+# data = []
+
+# for i in list_jobs:
+#     search_position = i
+#     location = ''
+#     search_position = search_position.lower().replace(' ','+')
+#     location = location.lower().replace(' ','+')
+
+# template = 'https://glints.com/id/opportunities/jobs/explore?'
+# url_params = 'keyword={}&country=ID&locationName={}' if search_position and location else 'keyword={}&country=ID&locationName=All+Cities%2FProvinces'
+
+
+data = []
+url = 'https://glints.com/id/opportunities/jobs/explore?keyword={}&country=ID&locationName=All+Cities%2FProvinces'.format(list_jobs)
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+response = requests.get(url, headers=headers)
+
+if response.status_code == 200:
+    soup = BeautifulSoup(response.content, 'html.parser')
     job_cards = soup.find_all('div', class_='JobCardsc__JobcardContainer-sc-hmqj50-0 iirqVR CompactOpportunityCardsc__CompactJobCardWrapper-sc-dkg8my-2 bMyejJ compact_job_card')
-    print(job_cards)
-
-    
-    if len(job_cards) == 0:
-        print('No More Jobs')
-        break
-    print('page',page_number,'jobs found', len(job_cards))
-
 
     for job_card in job_cards:
-        job_title = find_tag_value(job_card, 'h3', '        CompactOpportunityCardsc__JobTitle-sc-dkg-12my-9 hgMGcy')
-        print(job_title)
+        job_title = find_tag_value(job_card, 'h3', 'CompactOpportunityCardsc__JobTitle-sc-dkg8my-9 hgMGcy')
         company_name = find_tag_value(job_card, 'a', 'CompactOpportunityCardsc__CompanyLink-sc-dkg8my-10 iTRLWx')
-        print(company_name)
         job_location = find_tag_value(job_card, 'span', 'CardJobLocation__StyledTruncatedLocation-sc-1by41tq-1 kEinQH')
-        print(job_location)
-    
-    # for job_element in job_elements:
-    #     job_title = find_tag_value(job_element, "h3", "CompactOpportunityCardsc__JobTitle-sc-dkg8my-9 hgMGcy")
-    #     company = find_tag_value(job_element, "span", "CompactOpportunityCardsc__CompanyLink-sc-dkg8my-10 iTRLWx")
-    #     location = find_tag_value(job_element, "span", "CardJobLocation__StyledTruncatedLocation-sc-1by41tq-1 kEinQH")
-    #     # Create a dictionary to store the job information
-    #     job_info = {
-    #         "Job Title": job_title,
-    #         "Company": company,
-    #         "Location": location
-    #     }
+        work_place = find_tag_value(job_card, 'div', 'TagStyle-sc-r1wv7a-4 bJWZOt CompactOpportunityCardTags__Tag-sc-610p59-1 hncMah')
+        # years_experience = find_tag_value(job_card, 'div', 'TagStyle__TagContentWrapper-sc-r1wv7a-1 koGVuk')
+        more_detail_link = 'https://glints.com'+ job_card.find('a', class_= 'CompactOpportunityCardsc__CardAnchorWrapper-sc-dkg8my-24 knEIai job-search-results_job-card_link').get('href')
+        
+        posted_date = find_tag_value(job_card, 'div', 'CompactOpportunityCardsc__OpportunityFooter-sc-dkg8my-19 hwYSIu')
+        current_date = pd.Timestamp.now().strftime('%Y-%m-%d')
 
-    #     # Add the job information to the job_data list
-    #     job_data.append(job_info)
+        if 'hari' in posted_date:
+            days = int(posted_date[0])
+            posted_date = (pd.Timestamp.now() - pd.Timedelta(days=days)).strftime('%Y-%m-%d')
+        elif 'Kemarin' in posted_date:
+            posted_date = (pd.Timestamp.now() - pd.Timedelta(days=1)).strftime('%Y-%m-%d')
+        
 
-    #     # Check if the desired number of records has been reached
-    #     if len(job_data) >= num_data:
-    #         break
+        salary_range = find_tag_value(job_card, 'span', 'CompactOpportunityCardsc__NotDisclosedMessage-sc-dkg8my-23 hivaYx')
+        if salary_range:
+            salary_range = 'Not Written'
+        else:
+            salary_range = find_tag_value(job_card, 'span', 'CompactOpportunityCardsc__SalaryWrapper-sc-dkg8my-29 gfPeyg')
+        
+        skill = find_tag_attr(job_card, 'card-info').replace('experience,logo,','')
+        job_id = find_tag_attr(job_card, 'id')
+        work_type = find_tag_attr(job_card, 'type')
+        category = find_tag_attr(job_card, 'category')
+        sub_category = find_tag_attr(job_card, 'sub-category')
+        role = find_tag_attr(job_card, 'role')
 
-    # print(page_number)
+        print(f"Job Title: {job_title}")
+        print(f"Company Name: {company_name}")
 
-    # # Check if there are no more pages to scrape
-    # if not soup.find("a", class_="Pagination__NextLink-sc-16r01zq-2 fLLujR"):
-    #     break
-    
-    # Increment the page number for the next iteration
-    page_number += 1
+        print(f"Posted Date: {posted_date}")
+        print(f"Salary: {salary_range}")
+        
+        data.append({
+            'job_title': job_title,
+            'company_name': company_name,
+            'job_location': job_location,
+            'work_place': work_place,
+            'salary_range': salary_range,
+            'more_detail_link': more_detail_link,
+            'job_id': job_id,
+            'work_type': work_type,
+            'category': category,
+            'sub_category': sub_category,
+            'role': role
+        })
+        
+else:
+    print(f"Failed to fetch URL: {url}")
 
 
-# df = pd.DataFrame(job_data)
+
+df = pd.DataFrame(data)
 # script_dir = os.path.dirname(os.path.abspath(__file__))
 # custom_name = f'list_of_jobs_glints.csv'
 # file_path = os.path.join(script_dir, custom_name)
