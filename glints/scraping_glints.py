@@ -31,7 +31,6 @@ for i in list_jobs:
 # template = 'https://glints.com/id/opportunities/jobs/explore?'
 # url_params = 'keyword={}&country=ID&locationName={}' if search_position and location else 'keyword={}&country=ID&locationName=All+Cities%2FProvinces'
 
-
     while True:
         # find using listed job #1
         url = 'https://glints.com/id/opportunities/jobs/explore?keyword={}&country=ID&locationName=All+Cities%2FProvinces&page={}'.format(search_position,page)
@@ -40,7 +39,6 @@ for i in list_jobs:
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
         response = requests.get(url, headers=headers)
 
-
         if response.status_code == 200:
             soup = BeautifulSoup(response.content, 'html.parser')
             job_cards = soup.find_all('div', class_='JobCardsc__JobcardContainer-sc-hmqj50-0 iirqVR CompactOpportunityCardsc__CompactJobCardWrapper-sc-dkg8my-2 bMyejJ compact_job_card')
@@ -48,7 +46,6 @@ for i in list_jobs:
             if len(job_cards) == 0:
                 print('No more jobs to fetch')
                 break
-
 
             for job_card in job_cards:
                 job_title = find_tag_value(job_card, 'h3', 'CompactOpportunityCardsc__JobTitle-sc-dkg8my-9 hgMGcy')
@@ -70,7 +67,6 @@ for i in list_jobs:
                 category = find_tag_attr(job_card, 'category')
                 sub_category = find_tag_attr(job_card, 'sub-category')
                 role = find_tag_attr(job_card, 'role')
-
 
                 print(f"Job Title: {job_title}")
                 print(f"Company Name: {company_name}")
