@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 import os
-import re
 
 # Helper Function
 def find_tag_value(soup, tag, class_name):
@@ -18,7 +17,7 @@ def find_tag_attr(job_card, attr):
         return None
     
 
-# list_jobs = {'golang','.net','php developer','laravel','java','python','nodejs','reactjs','nextjs','angularjs','fluter','kotlin','vuejs','backend','frontend','mobile','data analyst','data scientist','data engineer','software engineer','software developer','full-stack','programmer','javascript','user interface','user experience','hr officer','accounting officer'}
+list_jobs = {'golang','.net','php developer','laravel','java','python','nodejs','reactjs','nextjs','angularjs','fluter','kotlin','vuejs','backend','frontend','mobile','data analyst','data scientist','data engineer','software engineer','software developer','full-stack','programmer','javascript','user interface','user experience','hr officer','accounting officer'}
 
 # list_jobs = {'golang'}
 
@@ -33,87 +32,67 @@ for i in list_jobs:
 # url_params = 'keyword={}&country=ID&locationName={}' if search_position and location else 'keyword={}&country=ID&locationName=All+Cities%2FProvinces'
 
     while True:
-        # 1. find using input job on list
-        # url = 'https://glints.com/id/opportunities/jobs/explore?keyword={}&country=ID&locationName=All+Cities%2FProvinces&page={}'.format(search_position,page)
-
-        # 2. find using category = computer information technology
+        # find using listed job #1
+        url = 'https://glints.com/id/opportunities/jobs/explore?keyword={}&country=ID&locationName=All+Cities%2FProvinces&page={}'.format(search_position,page)
+        # find using category = computer information technology #2
         url = 'https://glints.com/id/job-category/computer-information-technology?page={}'.format(page)
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
         response = requests.get(url, headers=headers)
 
-        # if response.status_code == 200:
-        soup = BeautifulSoup(response.content, 'html.parser')
-        job_cards = soup.find('div', class_='JobCardsc__JobcardContainer-sc-hmqj50-0 iirqVR CompactOpportunityCardsc__CompactJobCardWrapper-sc-dkg8my-2 bMyejJ compact_job_card')
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.content, 'html.parser')
+            job_cards = soup.find_all('div', class_='JobCardsc__JobcardContainer-sc-hmqj50-0 iirqVR CompactOpportunityCardsc__CompactJobCardWrapper-sc-dkg8my-2 bMyejJ compact_job_card')
+
+            if len(job_cards) == 0:
+                print('No more jobs to fetch')
+                break
+
+            for job_card in job_cards:
+                job_title = find_tag_value(job_card, 'h3', 'CompactOpportunityCardsc__JobTitle-sc-dkg8my-9 hgMGcy')
+                company_name = find_tag_value(job_card, 'a', 'CompactOpportunityCardsc__CompanyLink-sc-dkg8my-10 iTRLWx')
+                job_location = find_tag_value(job_card, 'span', 'CardJobLocation__StyledTruncatedLocation-sc-1by41tq-1 kEinQH')
+                work_place = find_tag_value(job_card, 'div', 'TagStyle-sc-r1wv7a-4 bJWZOt CompactOpportunityCardTags__Tag-sc-610p59-1 hncMah')
+                years_experience = find_tag_value(job_card, 'div', 'TagStyle-sc-r1wv7a-4 bJWZOt CompactOpportunityCardTags__Tag-sc-610p59-1 hncMah')
+                more_detail_link = 'https://glints.com'+ job_card.find('a', class_= 'CompactOpportunityCardsc__CardAnchorWrapper-sc-dkg8my-24 knEIai job-search-results_job-card_link').get('href')
                 
-        for job_card in job_cards:
-            job_title = find_tag_value(job_card, 'h3', 'CompactOpportunityCardsc__JobTitle-sc-dkg8my-9 hgMGcy')
-            company_name = find_tag_value(job_card, 'a', 'CompactOpportunityCardsc__CompanyLink-sc-dkg8my-10 iTRLWx')
-            job_location = find_tag_value(job_card, 'span', 'CardJobLocation__StyledTruncatedLocation-sc-1by41tq-1 kEinQH')
-            work_place = find_tag_value(job_card, 'div', 'TagStyle-sc-r1wv7a-4 bJWZOt CompactOpportunityCardTags__Tag-sc-610p59-1 hncMah')
-            job_tags = job_cards.find_all('div', class_='TagStyle__TagContentWrapper-sc-r1wv7a-1 koGVuk')
-            job_tag_values = [tag.text for tag in job_tags]
-            years_experience = job_tag_values[2]
-            min_education = job_tag_values[3]
-            
-            salary_range = find_tag_value(job_card, 'span', 'CompactOpportunityCardsc__NotDisclosedMessage-sc-dkg8my-23 hivaYx')
-            if salary_range:
-                salary_range = 'Not Written'
-            else:
-                salary_range = find_tag_value(job_card, 'span', 'CompactOpportunityCardsc__SalaryWrapper-sc-dkg8my-29 gfPeyg')
-            
-            skill = find_tag_attr(job_card, 'card-info').replace('experience,logo,','')
-            job_id = find_tag_attr(job_card, 'id')
-            work_type = find_tag_attr(job_card, 'type')
-            category = find_tag_attr(job_card, 'category')
-            sub_category = find_tag_attr(job_card, 'sub-category')
-            role = find_tag_attr(job_card, 'role')
+                salary_range = find_tag_value(job_card, 'span', 'CompactOpportunityCardsc__NotDisclosedMessage-sc-dkg8my-23 hivaYx')
+                if salary_range:
+                    salary_range = 'Not Written'
+                else:
+                    salary_range = find_tag_value(job_card, 'span', 'CompactOpportunityCardsc__SalaryWrapper-sc-dkg8my-29 gfPeyg')
+                
+                skill = find_tag_attr(job_card, 'card-info').replace('experience,logo,','')
+                job_id = find_tag_attr(job_card, 'id')
+                work_type = find_tag_attr(job_card, 'type')
+                category = find_tag_attr(job_card, 'category')
+                sub_category = find_tag_attr(job_card, 'sub-category')
+                role = find_tag_attr(job_card, 'role')
 
-            more_detail_link = 'https://glints.com'+ job_card.find('a', class_= 'CompactOpportunityCardsc__CardAnchorWrapper-sc-dkg8my-24 knEIai job-search-results_job-card_link').get('href')
-            # detail link request
-            response_detail = requests.get(more_detail_link, headers=headers)
-            soup_detail = BeautifulSoup(response_detail.content, 'html.parser')
-            posted_date = find_tag_value(soup_detail,'div','JobDescriptionsc__DescriptionContainer-sc-22zrgx-2 jCwTA-d')
-            print('posted_date:',posted_date)
-            job_description = find_tag_value(soup_detail,'div','JobDescriptionsc__DescriptionContainer-sc-22zrgx-2 jCwTA-d')
-
-            print(f"Job Title: {job_title}")
-            print(f"Company Name: {company_name}")
-            print(f"Experience: {years_experience}")
-            print(f"Education: {min_education}")
-            print(f"Work Place: {work_place}")
-            print(f"Work Type: {work_type}")
-            # print(f"Posted Date: {posted_date}")
-            print(f"Salary: {salary_range}")
-            print(f"Detail Description: {job_description}")
-            
-            data.append({
-                'job_title': job_title,
-                'company_name': company_name,
-                'job_location': job_location,
-                'work_place': work_place,
-                'salary_range': salary_range,
-                'more_detail_link': more_detail_link,
-                'job_id': job_id,
-                'work_type': work_type,
-                'workplace': work_place,
-                'years_experience': years_experience,
-                'min_education': min_education,
-                'category': category,
-                'sub_category': sub_category,
-                'role': role
-            })
-            
-        page += 1
-        next_button = soup.find('a', class_='pagination__link pagination__next')
-        if not next_button:
-            print('No more pages to fetch')
-            break
-        
+                print(f"Job Title: {job_title}")
+                print(f"Company Name: {company_name}")
+                print(f"Experience: {years_experience}")
+                # print(f"Posted Date: {posted_date}")
+                # print(f"Salary: {salary_range}")
+                
+                data.append({
+                    'job_title': job_title,
+                    'company_name': company_name,
+                    'job_location': job_location,
+                    'work_place': work_place,
+                    'salary_range': salary_range,
+                    'more_detail_link': more_detail_link,
+                    'job_id': job_id,
+                    'work_type': work_type,
+                    'category': category,
+                    'sub_category': sub_category,
+                    'role': role
+                })
+            page += 1
         else:
             print(f"Failed to fetch URL: {url}")
             break
-    break
-    
+
+
 
 df = pd.DataFrame(data)
 
