@@ -10,10 +10,13 @@ import csv
 # Helper Function
 def find_tag_value(soup, tag, class_name, index=None):
     try:
+        elements = soup.find_all(tag, class_=class_name)
         if index is None:
-            return soup.find(tag, class_=(class_name)).text.strip()
+            return elements[0].text.strip() if elements else None
+        elif len(elements) > index:
+            return elements[index].text.strip()
         else:
-            return soup.find_all(tag, class_=(class_name))[index].text.strip()
+            return None
     except AttributeError:
         return None
 
@@ -96,7 +99,7 @@ print('Total Jobs:', len(data))
 df = pd.DataFrame(data)
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-custom_name = f'list_of_jobs_glints_1.csv'
+custom_name = f'raw_jobs_glints_april.csv'
 file_path = os.path.join(script_dir, custom_name)
 df.to_csv(file_path, index=False, encoding='utf-8')
 

@@ -10,8 +10,8 @@ def find_tag_value(soup, tag, attribute):
     except AttributeError:
         return None
     
-list_jobs = {'golang','.net','php','laravel','java','python','nodejs','reactjs','nextjs','angularjs','fluter','kotlin','vuejs','backend','frontend','mobile','data','software engineer','software developer','full-stack','programmer','javascript','hr officer','accounting officer'}
-
+# list_jobs = {'golang','.net','php','laravel','java','python','nodejs','reactjs','nextjs','angularjs','fluter','kotlin','vuejs','backend','frontend','mobile','data','software engineer','software developer','full-stack','programmer','javascript','hr officer','accounting officer'}
+list_jobs = {'golang','.net'}
 page = 1
 data = []
 
@@ -94,14 +94,25 @@ for i in list_jobs:
             
         page += 1
 
-df = pd.DataFrame(data)
-script_dir = os.path.dirname(os.path.abspath(__file__))
+    if data:
+        # Convert the collected data into a DataFrame
+        df = pd.DataFrame(data)
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        custom_name = f'{search_position}.csv'  # Name of the CSV file based on the search_position
+        file_path = os.path.join(script_dir, custom_name)
+        df.to_csv(file_path, index=False, encoding='utf-8')  # Save to CSV
+        print(f"Data for {search_position} saved to {file_path}")
+    
+    page = 1
+
+    
+# df = pd.DataFrame(data)
+# script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # save to json file mongodb
 
-custom_name = f'jobs_jobstreet_2.csv'
-file_path = os.path.join(script_dir, custom_name)
-df.to_csv(file_path, index=False, encoding='utf-8')
+# file_path = os.path.join(script_dir, custom_name)
+# df.to_csv(file_path, index=False, encoding='utf-8')
 
 
 

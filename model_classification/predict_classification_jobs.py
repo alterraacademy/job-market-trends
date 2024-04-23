@@ -2,14 +2,28 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.svm import SVC
 
-# Read data from CSV file
 df = pd.read_csv('glints/list_of_jobs_glints_2.csv')
 
 # Feature extraction
 vectorizer = TfidfVectorizer(stop_words='english')
 X = vectorizer.fit_transform(df['job_title'])
 
-# Combine 'sub_category' and 'role' into a single column
+# dense_matrix = pd.DataFrame(X.toarray(), columns=vectorizer.get_feature_names_out())
+# frontend_scores = dense_matrix['frontend']
+# backend_scores = dense_matrix['backend']
+# avg_frontend_score = frontend_scores.mean()
+# avg_backend_score = backend_scores.mean()
+# top_frontend_titles = df.loc[frontend_scores.nlargest(5).index]['job_title']
+# top_backend_titles = df.loc[backend_scores.nlargest(5).index]['job_title']
+
+# print(dense_matrix)
+# print(frontend_scores)
+# print(backend_scores)
+# print(avg_frontend_score)
+# print(avg_backend_score)
+# print(top_frontend_titles)
+# print(top_backend_titles)
+
 y = df['sub_category'] + ' - ' + df['role']
 
 # Train SVM classifier
@@ -17,6 +31,9 @@ svm_classifier = SVC(kernel='linear')
 svm_classifier.fit(X, y)
 
 def predict_job_title(job_title):
+    # split input into each word
+    words = job_title.split()
+    
     # Vectorize input job title
     job_title_vectorized = vectorizer.transform([job_title])
     
@@ -26,8 +43,12 @@ def predict_job_title(job_title):
     
     return predicted_sub_category, predicted_role
 
-data_jobstreet = pd.read_csv('jobstreet/clean.csv')
-job_title_jobstreet = data_jobstreet['Job Title']
+# sub_cat, role = predict_job_title('Front End Developer')
+# print(sub_cat, role)
+
+
+data_jobstreet = pd.read_csv('glints/glints_mid_april.csv')
+job_title_jobstreet = data_jobstreet['job_title']
 
 predicted_job_titles = []
 predicted_categories = []
@@ -46,4 +67,4 @@ predicted_df = pd.DataFrame({
     'predicted_role': predicted_roles
 })
 
-predicted_df.to_csv('jobstreet/predicted_jobstreet.csv', index=False)
+predicted_df.to_csv('glints/predicted_glints.csv', index=False)
