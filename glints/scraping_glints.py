@@ -31,9 +31,13 @@ def find_tag_attr(job_card, attr):
 data = []
 page = 1
 
+searched_position = input('Enter the job you want to search: ')
+searched_position = searched_position.replace(' ', '+')
+
 # Scraping
 while True:
-    url = 'https://glints.com/id/job-category/computer-information-technology?page={}'.format(page)
+    # url = 'https://glints.com/id/job-category/computer-information-technology?page={}'.format(page)
+    url = 'https://glints.com/id/opportunities/jobs/explore?keyword={}&country=ID&locationName=All+Cities%2FProvinces&page={}'.format(searched_position, page)
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
     response = requests.get(url, headers=headers)
 
@@ -99,9 +103,10 @@ print('Total Jobs:', len(data))
 df = pd.DataFrame(data)
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-custom_name = f'raw_jobs_glints_april.csv'
+custom_name = f'{scrapped_date}.csv'  # Name of the CSV file based on the search_position
 file_path = os.path.join(script_dir, custom_name)
-df.to_csv(file_path, index=False, encoding='utf-8')
+df.to_csv(file_path, index=False, encoding='utf-8')  # Save to CSV
+print(f"Data Collected")
 
 # # Connect to MongoDB
 # client = MongoClient('localhost', 27017)

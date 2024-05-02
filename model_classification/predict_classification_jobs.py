@@ -47,7 +47,7 @@ def predict_job_title(job_title):
 # print(sub_cat, role)
 
 
-data_jobstreet = pd.read_csv('glints/glints_mid_april.csv')
+data_jobstreet = pd.read_csv('glints/role.csv')
 job_title_jobstreet = data_jobstreet['job_title']
 
 predicted_job_titles = []
